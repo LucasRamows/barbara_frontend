@@ -8,6 +8,12 @@ import {
   Save,
   Trash2,
   X,
+  FileText,
+  Activity,
+  UploadCloud,
+  Loader2,
+  Scale,
+  Camera
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import apiBack from "../../api/apiBack";
@@ -18,6 +24,20 @@ interface HealthExam {
   date: string;
   category: string;
   note: string;
+  fileUrl?: string;
+}
+
+interface Procedure {
+  id: string;
+  description: string;
+  date: string;
+  notes: string;
+}
+
+interface WeightTrack {
+  id: string;
+  weight: number;
+  date: string;
 }
 
 interface Tasks {
@@ -44,6 +64,13 @@ const HealthModule: React.FC = () => {
   const [task, setTask] = useState<Tasks[]>([]);
 
   const [loading, setLoading] = useState(false);
+  const [examFile, setExamFile] = useState<File | null>(null);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+
+  // New states for tabs and mock data
+  const [activeTab, setActiveTab] = useState<"exams" | "procedures" | "tracking">("exams");
+  const [procedures, setProcedures] = useState<Procedure[]>([]);
+  const [weights, setWeights] = useState<WeightTrack[]>([]);
 
   useEffect(() => {
     const fetchExams = async () => {
@@ -51,9 +78,7 @@ const HealthModule: React.FC = () => {
         const { data } = await apiBack.get<HealthExam[]>(`/private/health`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         setExams(data);
-        console.log("Notas carregadas:", data);
       } catch (error) {
         console.error("Erro ao buscar notas:", error);
       }
@@ -67,11 +92,15 @@ const HealthModule: React.FC = () => {
           ? data.filter((task: Tasks) => task.type === "HEALTH")
           : [];
         setTask(onlyHealthTasks);
-        console.log("Notas carregadas:", onlyHealthTasks);
       } catch (error) {
         console.error("Erro ao buscar notas:", error);
       }
     };
+    
+    // Simulação temporária
+    setProcedures([{ id: "1", description: "Fisioterapia", date: "2023-11-20", notes: "Sessão 1/10 feita." }]);
+    setWeights([{ id: "1", weight: 75.5, date: "2023-10-15" }, { id: "2", weight: 74.2, date: "2023-11-20" }]);
+
     if (token) {
       fetchExams();
       fetchTasks();
@@ -83,17 +112,37 @@ const HealthModule: React.FC = () => {
     date: "",
     category: "",
     note: "",
+    fileUrl: "",
   });
 
   const handleSaveExam = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsUploadingFile(true);
+    let finalFileUrl = newExam.fileUrl;
+
+    if (examFile) {
+      const formData = new FormData();
+      formData.append("file", examFile);
+      try {
+        const uploadRes = await apiBack.post("/private/health/upload", formData, {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        });
+        finalFileUrl = uploadRes.data.url;
+      } catch (err) {
+        console.warn("Rota de upload não pronta, fallback ignorando foto", err);
+      }
+    }
+
     const examToAdd = {
       ...newExam,
+      fileUrl: finalFileUrl,
       id: Math.random().toString(36).substr(2, 9),
     };
     try {
-      console.log(newExam);
-      await apiBack.post<HealthExam[]>(`/private/health`, newExam, {
+      await apiBack.post<HealthExam[]>(`/private/health`, examToAdd, {
         headers: { Authorization: `Bearer ${token}` },
       });
     } catch (error) {
@@ -101,8 +150,10 @@ const HealthModule: React.FC = () => {
     }
 
     setExams([examToAdd, ...exams]);
+    setIsUploadingFile(false);
     setIsModalOpen(false);
-    setNewExam({ title: "", date: "", category: "", note: "" });
+    setExamFile(null);
+    setNewExam({ title: "", date: "", category: "", note: "", fileUrl: "" });
   };
   const handleDeleteExam = async (id: string) => {
     try {
@@ -170,11 +221,17 @@ const HealthModule: React.FC = () => {
       {/* HEADER */}
       <header className="mb-8">
         <h1 className="font-neusharp text-2xl text-primary tracking-tighter italic">
-          Sáude
+          Saúde
         </h1>
+        <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide">
+          <button onClick={() => setActiveTab("exams")} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "exams" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>Exames & Laudos</button>
+          <button onClick={() => setActiveTab("procedures")} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "procedures" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>Procedimentos</button>
+          <button onClick={() => setActiveTab("tracking")} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === "tracking" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}>Acompanhamento</button>
+        </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {activeTab === "exams" && (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in duration-300">
         {/* COLUNA: LISTA DE EXAMES */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
@@ -213,6 +270,11 @@ const HealthModule: React.FC = () => {
                       </span>
                       {/* Espaço para botões de ação se necessário */}
                       <div className="flex gap-2">
+                        {exam.fileUrl && (
+                          <a href={exam.fileUrl} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-indigo-500 transition-colors">
+                            <FileText size={14} />
+                          </a>
+                        )}
                         <button
                           onClick={() => onEdit(exam)}
                           className="text-muted-foreground hover:text-primary transition-colors"
@@ -325,6 +387,81 @@ const HealthModule: React.FC = () => {
           </div>
         </section>
       </div>
+      )}
+
+      {activeTab === "procedures" && (
+      <div className="space-y-6 animate-in fade-in duration-300">
+         <div className="flex justify-between items-center bg-card p-6 rounded-3xl border border-border shadow-sm">
+            <div>
+               <h2 className="font-neusharp text-xl flex items-center gap-2 italic">
+                 <Activity className="text-primary" size={24} /> Meus Processos
+               </h2>
+               <p className="text-xs text-muted-foreground mt-1">Acompanhe seus procedimentos médicos e recuperações.</p>
+            </div>
+            <button className="bg-primary text-primary-foreground px-4 py-2 rounded-xl font-bold flex items-center gap-2 text-sm">
+               <Plus size={16} /> Novo Processo
+            </button>
+         </div>
+
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {procedures.map(proc => (
+              <div key={proc.id} className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-center mb-3">
+                   <h3 className="font-bold text-lg">{proc.description}</h3>
+                   <span className="text-xs bg-secondary text-secondary-foreground font-bold px-3 py-1 rounded-lg flex items-center gap-1"><Calendar size={12}/>{new Date(proc.date).toLocaleDateString()}</span>
+                </div>
+                <div className="bg-background/50 rounded-xl p-4 border border-border/50 text-sm text-muted-foreground leading-relaxed">
+                   {proc.notes}
+                </div>
+              </div>
+            ))}
+         </div>
+      </div>
+      )}
+
+      {activeTab === "tracking" && (
+      <div className="space-y-6 animate-in fade-in duration-300">
+         {/* Evolução de Peso */}
+         <div className="bg-card p-6 rounded-3xl border border-border shadow-sm flex flex-col md:flex-row gap-6 items-center">
+            <div className="p-4 bg-primary/10 rounded-full text-primary">
+               <Scale size={48} />
+            </div>
+            <div className="flex-1">
+               <h3 className="font-bold text-xl">Controle de Peso</h3>
+               <p className="text-xs text-muted-foreground mt-1">Insira seu peso regularmente para comparar sua evolução.</p>
+               
+               <div className="flex items-center gap-4 mt-4">
+                  {weights.slice(-2).map((w, i) => (
+                    <div key={w.id} className={`p-4 rounded-2xl border ${i === 1 ? 'bg-primary border-primary text-primary-foreground' : 'bg-background border-border text-foreground'}`}>
+                      <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">{i === 1 ? 'Atual' : 'Anterior'}</p>
+                      <p className="font-neusharp text-2xl italic">{w.weight} kg</p>
+                    </div>
+                  ))}
+                  <button className="h-full px-6 py-4 border-2 border-dashed border-border rounded-2xl text-muted-foreground hover:border-primary hover:text-primary transition-all font-bold flex flex-col items-center justify-center gap-1">
+                    <Plus size={18} /> Add
+                  </button>
+               </div>
+            </div>
+         </div>
+
+         {/* Fotos de Acompanhamento */}
+         <div className="bg-card p-6 rounded-3xl border border-border shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+               <h3 className="font-bold text-xl flex items-center gap-2"><Camera className="text-primary"/> Fotos Diárias/Mensais</h3>
+               <button className="bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground px-4 py-2 rounded-xl font-bold flex items-center gap-2 text-sm transition-colors">
+                  <UploadCloud size={16} /> Enviar Imagem
+               </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+               {/* Placeholders visuais para mostrar ideia */}
+               <div className="aspect-[3/4] bg-muted rounded-2xl border border-border flex items-center justify-center text-muted-foreground flex-col gap-2">
+                  <Camera size={24} className="opacity-50" />
+                  <span className="text-[10px] uppercase font-black tracking-widest">Novembro</span>
+               </div>
+            </div>
+         </div>
+      </div>
+      )}
 
       {/* --- MODAL DE CADASTRO --- */}
       {isModalOpen && (
@@ -407,11 +544,24 @@ const HealthModule: React.FC = () => {
                 />
               </div>
 
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
+                  Anexar Laudo (PDF/Imagem)
+                </label>
+                <input
+                  type="file"
+                  onChange={(e) => setExamFile(e.target.files?.[0] || null)}
+                  className="w-full bg-background border border-input p-3 rounded-xl file:mr-4 file:px-4 file:py-2 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 text-sm"
+                />
+              </div>
+
               <button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-neusharp italic flex items-center justify-center gap-2 mt-4 hover:opacity-90 transition-all shadow-lg shadow-primary/20"
+                disabled={isUploadingFile}
+                className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-neusharp italic flex items-center justify-center gap-2 mt-4 hover:opacity-90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
               >
-                <Save size={18} /> SALVAR REGISTRO
+                {isUploadingFile ? <Loader2 className="animate-spin" size={18}/> : <Save size={18} />} 
+                {isUploadingFile ? "SALVANDO..." : "SALVAR REGISTRO"}
               </button>
             </form>
           </div>

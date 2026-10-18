@@ -1,86 +1,88 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { z } from "zod";
-import apiBack from "../../api/apiBack";
-import { Button } from "../../components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../../components/ui/form";
-import { Input } from "../../components/ui/input";
-import { loginForm } from "../../validation";
-import { useData } from "../../contexts/DataContext";
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { useSession } from '@/contexts/SessionContext'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
-const SigninForm = () => {
-  const navigate = useNavigate();
-  const { refreshData } = useData();
-  const form = useForm<z.infer<typeof loginForm>>({
-    resolver: zodResolver(loginForm),
-    defaultValues: {
-      email: "",
-      key: "",
-    },
-  });
+const schema = z.object({
+  username: z.string().min(1, 'Informe seu usuário'),
+  password: z.string().min(1, 'Informe sua senha'),
+})
 
-  const onSubmit = (values: z.infer<typeof loginForm>) => {
-    apiBack
-      .post("public/login", { email: values.email, password: values.key })
-      .then((res) => {
-        localStorage.setItem("token", res.data.token);
-        refreshData();
-        navigate("/dashboard");
-      })
-      .catch((err) => {
-        console.error("Erro ao fazer login:", err);
-        if (!confirm("Credenciais Inválidas")) return;
-      });
-  };
+type FormValues = z.infer<typeof schema>
+
+export default function SigninForm() {
+  const { login } = useSession()
+  const [loading, setLoading] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({ resolver: zodResolver(schema) })
+
+  const onSubmit = async (values: FormValues) => {
+    setLoading(true)
+    try {
+      await login(values.username, values.password)
+    } catch {
+      toast.error('Usuário ou senha incorretos.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div className="w-full px-6 md:px-10 md:w-1/2 flex flex-col gap-4 mx-auto">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-6"
-        >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input type="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6" noValidate>
+      <div>
+        <h1 className="font-display text-2xl font-bold text-foreground">Entrar</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Acesse a plataforma Bárbara.</p>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="username">Usuário ou identificador</Label>
+          <Input
+            id="username"
+            type="text"
+            autoComplete="username"
+            autoCapitalize="none"
+            {...register('username')}
           />
+          {errors.username && (
+            <p className="text-xs text-destructive">{errors.username.message}</p>
+          )}
+        </div>
 
-          <FormField
-            control={form.control}
-            name="key"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Senha</FormLabel>
-                <FormControl>
-                  <Input type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="password">Senha</Label>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            {...register('password')}
           />
+          {errors.password && (
+            <p className="text-xs text-destructive">{errors.password.message}</p>
+          )}
+        </div>
+      </div>
 
-          <Button type="submit">Entrar</Button>
-        </form>
-      </Form>
-    </div>
-  );
-};
-
-export default SigninForm;
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? (
+          <>
+            <Loader2 size={16} className="animate-spin" />
+            Entrando...
+          </>
+        ) : (
+          'Iniciar sessão'
+        )}
+      </Button>
+    </form>
+  )
+}
