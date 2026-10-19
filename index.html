@@ -11,8 +11,14 @@
     <link rel="manifest" href="/manifest.json" />
     <title>Bárbara</title>
     <script>
-      const t = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      if (t === 'dark') document.documentElement.classList.add('dark');
+      (function() {
+        try {
+          var t = localStorage.getItem('barbara-theme') || localStorage.getItem('theme');
+          if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch(e) {}
+      })();
     </script>
   </head>
   <body>

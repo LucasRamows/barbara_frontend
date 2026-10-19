@@ -205,6 +205,23 @@
   }
 }
 
+/* iOS zoom prevention: inputs must be ≥ 16px */
+input,
+textarea,
+select {
+  font-size: max(1rem, 16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @keyframes fade-in-up {
   from {
     opacity: 0;
