@@ -48,6 +48,7 @@
   --color-status-warning: var(--status-warning);
   --color-status-info: var(--status-info);
   --color-status-error: var(--status-error);
+  --color-status-warning-emphasis: var(--status-warning-emphasis);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);

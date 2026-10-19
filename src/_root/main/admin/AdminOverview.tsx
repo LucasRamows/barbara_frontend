@@ -101,11 +101,11 @@ export default function AdminOverview() {
             {loading ? (
               <Skeleton className="h-6 w-24" />
             ) : maintenanceMode ? (
-              <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+              <Badge className="bg-warning/15 text-status-warning-emphasis">
                 Ativo
               </Badge>
             ) : (
-              <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+              <Badge className="bg-success/15 text-success">
                 Normal
               </Badge>
             )}

@@ -116,13 +116,13 @@ export default function AdminSettings() {
       </div>
 
       {maintenanceMode && (
-        <div className="flex items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/20">
+        <div className="flex items-center gap-3 rounded-xl border border-warning/40 bg-warning/10 p-4">
           <span className="text-xl">⚠️</span>
           <div>
-            <p className="font-semibold text-amber-800 dark:text-amber-300">
+            <p className="font-semibold text-status-warning-emphasis">
               Modo de manutenção ativo
             </p>
-            <p className="text-sm text-amber-700 dark:text-amber-400">
+            <p className="text-sm text-status-warning-emphasis">
               A plataforma está em manutenção. Usuários podem ter acesso restrito.
             </p>
           </div>

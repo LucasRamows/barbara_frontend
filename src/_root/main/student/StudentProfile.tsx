@@ -108,7 +108,7 @@ export default function StudentProfile() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Status</span>
-              <span className={user.status === 'ACTIVE' ? 'font-medium text-green-600' : 'font-medium text-muted-foreground'}>
+              <span className={user.status === 'ACTIVE' ? 'font-medium text-success' : 'font-medium text-muted-foreground'}>
                 {user.status === 'ACTIVE' ? 'Ativo' : user.status}
               </span>
             </div>

@@ -398,11 +398,11 @@ function DeloadSection({ studentId }: { studentId: string }) {
   return (
     <div>
       <p className="mb-2 text-sm font-semibold text-foreground flex items-center gap-1.5">
-        <AlertTriangle size={14} className="text-amber-500" />
+        <AlertTriangle size={14} className="text-status-warning-emphasis" />
         Período de deload
       </p>
       {activeDeload ? (
-        <Card className="border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30">
+        <Card className="border-warning/40 bg-warning/10">
           <CardContent className="flex items-start gap-3 p-4">
             <div className="flex-1 text-sm">
               <p className="font-medium text-foreground">

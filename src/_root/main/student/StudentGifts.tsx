@@ -106,11 +106,11 @@ export default function StudentGifts() {
                   )}
                   <div className="mt-1">
                     {gift.isDelivered ? (
-                      <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                      <Badge className="bg-success/15 text-success">
                         Entregue{gift.deliveredAt && ` · ${new Date(gift.deliveredAt).toLocaleDateString('pt-BR')}`}
                       </Badge>
                     ) : (
-                      <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                      <Badge className="bg-warning/15 text-status-warning-emphasis">
                         A caminho
                       </Badge>
                     )}
@@ -188,7 +188,7 @@ export default function StudentGifts() {
                       <div className="mb-2 flex items-center justify-between">
                         <p className="text-sm font-medium text-foreground">{p.rule.name}</p>
                         {p.isComplete ? (
-                          <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                          <Badge className="bg-success/15 text-success">
                             Conquistado!
                           </Badge>
                         ) : (

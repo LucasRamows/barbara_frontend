@@ -19,9 +19,9 @@ import { PasswordInput } from '@/components/shared/PasswordInput'
 import { adminService, type PersonalRow, type CreatePersonalData, type UpdatePersonalData } from '@/services/admin/admin.service'
 
 const STATUS_CONFIG = {
-  ACTIVE: { label: 'Ativo', className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
+  ACTIVE: { label: 'Ativo', className: 'bg-success/15 text-success' },
   INACTIVE: { label: 'Inativo', className: 'bg-muted text-muted-foreground' },
-  BLOCKED: { label: 'Bloqueado', className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
+  BLOCKED: { label: 'Bloqueado', className: 'bg-destructive/15 text-destructive' },
 }
 
 // ─── Create Sheet ─────────────────────────────────────────────────────────────
