@@ -12,10 +12,13 @@ export interface Gift {
 }
 
 export type RewardRuleType =
-  | 'SESSIONS_COUNT'
-  | 'STREAK_WEEKS'
-  | 'WEIGHT_MILESTONE'
-  | 'CONSISTENCY_PERCENT'
+  | 'TOTAL_WORKOUTS'
+  | 'WORKOUT_STREAK'
+  | 'WORKOUT_FREQUENCY'
+  | 'LOAD_INCREASE'
+  | 'EXERCISE_GOAL'
+  | 'SPECIFIC_WORKOUT'
+  | 'BODY_MEASUREMENT'
   | 'CUSTOM'
 
 export interface RewardRule {
@@ -61,9 +64,12 @@ export interface AdminStats {
 }
 
 export const RULE_TYPE_LABELS: Record<RewardRuleType, string> = {
-  SESSIONS_COUNT: 'Sessões',
-  STREAK_WEEKS: 'Semanas consecutivas',
-  WEIGHT_MILESTONE: 'Marco de carga',
-  CONSISTENCY_PERCENT: 'Consistência',
+  TOTAL_WORKOUTS: 'Total de treinos',
+  WORKOUT_STREAK: 'Sequência de treinos',
+  WORKOUT_FREQUENCY: 'Frequência semanal',
+  LOAD_INCREASE: 'Aumento de carga',
+  EXERCISE_GOAL: 'Meta em exercício',
+  SPECIFIC_WORKOUT: 'Conclusão de treino',
+  BODY_MEASUREMENT: 'Meta de medida',
   CUSTOM: 'Personalizado',
 }

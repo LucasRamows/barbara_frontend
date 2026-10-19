@@ -20,18 +20,24 @@ import type { Gift, RewardRule, RewardAchievement, RewardProgress, RewardRuleTyp
 import { RULE_TYPE_LABELS } from '@/types/gifts.types'
 
 const RULE_TYPE_OPTIONS: { value: RewardRuleType; label: string }[] = [
-  { value: 'SESSIONS_COUNT', label: 'Número de sessões' },
-  { value: 'STREAK_WEEKS', label: 'Semanas consecutivas' },
-  { value: 'WEIGHT_MILESTONE', label: 'Marco de carga (kg)' },
-  { value: 'CONSISTENCY_PERCENT', label: 'Consistência (%)' },
+  { value: 'TOTAL_WORKOUTS', label: 'Total de treinos' },
+  { value: 'WORKOUT_STREAK', label: 'Sequência de treinos' },
+  { value: 'WORKOUT_FREQUENCY', label: 'Frequência semanal' },
+  { value: 'LOAD_INCREASE', label: 'Aumento de carga (kg)' },
+  { value: 'EXERCISE_GOAL', label: 'Meta em exercício' },
+  { value: 'SPECIFIC_WORKOUT', label: 'Conclusão de treino' },
+  { value: 'BODY_MEASUREMENT', label: 'Meta de medida' },
   { value: 'CUSTOM', label: 'Personalizado' },
 ]
 
 const TARGET_LABELS: Record<RewardRuleType, string> = {
-  SESSIONS_COUNT: 'Sessões',
-  STREAK_WEEKS: 'Semanas',
-  WEIGHT_MILESTONE: 'Kg',
-  CONSISTENCY_PERCENT: '%',
+  TOTAL_WORKOUTS: 'Treinos',
+  WORKOUT_STREAK: 'Sequência',
+  WORKOUT_FREQUENCY: 'Sessões/semana',
+  LOAD_INCREASE: 'Kg',
+  EXERCISE_GOAL: 'Valor',
+  SPECIFIC_WORKOUT: 'Conclusões',
+  BODY_MEASUREMENT: 'Valor',
   CUSTOM: 'Valor',
 }
 
@@ -298,7 +304,7 @@ function RulesTab() {
       setRules(prev => [created, ...prev])
       toast.success('Regra criada!')
       setSheetOpen(false)
-      setForm({ name: '', description: '', type: 'SESSIONS_COUNT', targetValue: '', isActive: true })
+      setForm({ name: '', description: '', type: 'TOTAL_WORKOUTS', targetValue: '', isActive: true })
     } catch {
       toast.error('Erro ao criar regra')
     } finally {
