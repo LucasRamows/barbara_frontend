@@ -1,4 +1,4 @@
-import apiBack from "../../../api/apiBack";
+import apiBack from "@/lib/api";
 import type { MeasurementRecord } from "../../../types/body-evolution";
 
 const getHeaders = () => {

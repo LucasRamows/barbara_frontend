@@ -1,4 +1,5 @@
-import apiBack from "../../../api/apiBack";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import apiBack from "@/lib/api";
 import type { Exercise, WorkoutDay, WorkoutPlan } from "../../../types/workout";
 
 const getHeaders = () => {

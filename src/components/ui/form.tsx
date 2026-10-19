@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
@@ -32,10 +33,11 @@ const FormField = <
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   ...props
-}: ControllerProps<TFieldValues, TName>) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+}: Omit<ControllerProps<TFieldValues, TName>, 'control'> & { control?: any }) => {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
-      <Controller {...props} />
+      <Controller {...(props as ControllerProps<TFieldValues, TName>)} />
     </FormFieldContext.Provider>
   )
 }

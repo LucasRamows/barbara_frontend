@@ -16,7 +16,7 @@ import {
   Camera
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import apiBack from "../../api/apiBack";
+import apiBack from "@/lib/api";
 
 interface HealthExam {
   id: string;

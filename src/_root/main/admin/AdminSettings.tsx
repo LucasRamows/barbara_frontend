@@ -45,7 +45,7 @@ function SwitchToggle({ checked, onChange }: { checked: boolean; onChange: (v: b
       }`}
     >
       <span
-        className={`inline-block size-4 transform rounded-full bg-white shadow transition-transform ${
+        className={`inline-block size-4 transform rounded-full bg-primary-foreground shadow transition-transform ${
           checked ? 'translate-x-6' : 'translate-x-1'
         }`}
       />

@@ -2,6 +2,9 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import { SessionProvider, useSession } from '@/contexts/SessionContext'
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext'
+import { PWAUpdateBanner } from '@/components/pwa/PWAUpdateBanner'
+import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt'
 import AuthLayout from './_auth/AuthLayout'
 import SigninForm from './_auth/forms/SigninForm'
 import { StudentLayout } from './_root/layouts/StudentLayout'
@@ -15,11 +18,15 @@ const StudentHistory = lazy(() => import('./_root/main/student/StudentHistory'))
 const StudentEvolution = lazy(() => import('./_root/main/student/StudentEvolution'))
 const StudentGifts = lazy(() => import('./_root/main/student/StudentGifts'))
 const StudentProfile = lazy(() => import('./_root/main/student/StudentProfile'))
+const WorkoutSessionPage = lazy(() => import('./_root/main/student/WorkoutSessionPage'))
+const StudentSessionDetail = lazy(() => import('./_root/main/student/StudentSessionDetail'))
 
 // Personal pages
 const PersonalDashboard = lazy(() => import('./_root/main/personal/PersonalDashboard'))
 const PersonalStudents = lazy(() => import('./_root/main/personal/PersonalStudents'))
+const PersonalStudentDetail = lazy(() => import('./_root/main/personal/PersonalStudentDetail'))
 const PersonalWorkouts = lazy(() => import('./_root/main/personal/PersonalWorkouts'))
+const WorkoutPlanEditor = lazy(() => import('./_root/main/personal/WorkoutPlanEditor'))
 const PersonalGifts = lazy(() => import('./_root/main/personal/PersonalGifts'))
 const PersonalProfile = lazy(() => import('./_root/main/personal/PersonalProfile'))
 
@@ -29,6 +36,11 @@ const AdminPersonals = lazy(() => import('./_root/main/admin/AdminPersonals'))
 const AdminCriteria = lazy(() => import('./_root/main/admin/AdminCriteria'))
 const AdminSettings = lazy(() => import('./_root/main/admin/AdminSettings'))
 const AdminProfile = lazy(() => import('./_root/main/admin/AdminProfile'))
+
+function ThemedToaster() {
+  const { resolvedTheme } = useTheme()
+  return <Toaster richColors position="top-center" theme={resolvedTheme} />
+}
 
 const PageLoader = () => (
   <div className="flex min-h-[60vh] items-center justify-center">
@@ -83,7 +95,9 @@ function AppRoutes() {
           }
         >
           <Route path="/" element={<StudentToday />} />
+          <Route path="/sessao/:sessionId" element={<WorkoutSessionPage />} />
           <Route path="/historico" element={<StudentHistory />} />
+          <Route path="/historico/:sessionId" element={<StudentSessionDetail />} />
           <Route path="/evolucao" element={<StudentEvolution />} />
           <Route path="/gifts" element={<StudentGifts />} />
           <Route path="/perfil" element={<StudentProfile />} />
@@ -99,7 +113,10 @@ function AppRoutes() {
         >
           <Route path="/personal" element={<PersonalDashboard />} />
           <Route path="/personal/alunos" element={<PersonalStudents />} />
+          <Route path="/personal/alunos/:id" element={<PersonalStudentDetail />} />
           <Route path="/personal/treinos" element={<PersonalWorkouts />} />
+          <Route path="/personal/treinos/novo" element={<WorkoutPlanEditor />} />
+          <Route path="/personal/treinos/:id" element={<WorkoutPlanEditor />} />
           <Route path="/personal/gifts" element={<PersonalGifts />} />
           <Route path="/personal/perfil" element={<PersonalProfile />} />
         </Route>
@@ -127,9 +144,13 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <SessionProvider>
-      <AppRoutes />
-      <Toaster richColors position="top-center" />
-    </SessionProvider>
+    <ThemeProvider>
+      <SessionProvider>
+        <AppRoutes />
+        <ThemedToaster />
+        <PWAUpdateBanner />
+        <PWAInstallPrompt />
+      </SessionProvider>
+    </ThemeProvider>
   )
 }
