@@ -1,16 +1,20 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { SessionProvider, useSession } from '@/contexts/SessionContext'
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext'
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 import { PWAUpdateBanner } from '@/components/pwa/PWAUpdateBanner'
 import { PWAInstallPrompt } from '@/components/pwa/PWAInstallPrompt'
+import { PushNotificationBridge } from '@/components/pwa/PushNotificationBridge'
 import AuthLayout from './_auth/AuthLayout'
 import SigninForm from './_auth/forms/SigninForm'
 import { StudentLayout } from './_root/layouts/StudentLayout'
 import { PersonalLayout } from './_root/layouts/PersonalLayout'
 import { AdminLayout } from './_root/layouts/AdminLayout'
 import type { Role } from '@/types/auth.types'
+import { queryClient } from '@/lib/query-client'
 
 // Student pages
 const StudentToday = lazy(() => import('./_root/main/student/StudentToday'))
@@ -38,8 +42,8 @@ const AdminSettings = lazy(() => import('./_root/main/admin/AdminSettings'))
 const AdminProfile = lazy(() => import('./_root/main/admin/AdminProfile'))
 
 function ThemedToaster() {
-  const { resolvedTheme } = useTheme()
-  return <Toaster richColors position="top-center" theme={resolvedTheme} />
+  const { theme } = useTheme()
+  return <Toaster richColors position="top-center" theme={theme} />
 }
 
 const PageLoader = () => (
@@ -144,13 +148,18 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <SessionProvider>
-        <AppRoutes />
-        <ThemedToaster />
-        <PWAUpdateBanner />
-        <PWAInstallPrompt />
-      </SessionProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <SessionProvider>
+          <ErrorBoundary>
+            <AppRoutes />
+          </ErrorBoundary>
+          <ThemedToaster />
+          <PWAUpdateBanner />
+          <PWAInstallPrompt />
+          <PushNotificationBridge />
+        </SessionProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   )
 }

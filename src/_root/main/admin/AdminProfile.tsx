@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Loader2, ShieldCheck } from 'lucide-react'
+import { Loader2, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
+import { useSession } from '@/contexts/SessionContext'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { PasswordInput } from '@/components/shared/PasswordInput'
 
@@ -26,7 +26,18 @@ type PasswordValues = z.infer<typeof passwordSchema>
 
 interface UserMe { id: string; username: string; role: string; status: string }
 
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </div>
+  )
+}
+
 export default function AdminProfile() {
+  const { logout } = useSession()
   const [user, setUser] = useState<UserMe | null>(null)
   const [changingPw, setChangingPw] = useState(false)
 
@@ -52,66 +63,81 @@ export default function AdminProfile() {
     }
   }
 
-  return (
-    <div className="flex flex-col gap-4 p-4 md:p-6 md:max-w-2xl">
-      <h1 className="font-display text-2xl font-bold text-foreground">Meu perfil</h1>
+  const initials = user?.username?.slice(0, 2).toUpperCase() ?? 'SA'
 
-      {user && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <ShieldCheck size={16} className="text-primary" />
-              Conta
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Usuário</span>
-              <span className="font-medium">{user.username}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Papel</span>
-              <span className="font-medium text-primary">Super Admin</span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+  return (
+    <div className="flex flex-col gap-0 pb-8">
+      {/* Avatar header */}
+      <div className="flex flex-col items-center gap-3 px-4 py-6">
+        <div className="flex size-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
+          {initials}
+        </div>
+        {user && (
+          <div className="text-center">
+            <p className="font-display text-lg font-bold text-foreground">@{user.username}</p>
+            <p className="text-sm text-primary font-medium">Super Admin</p>
+          </div>
+        )}
+      </div>
 
       <Separator />
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Alterar senha</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={passwordForm.handleSubmit(onChangePassword)} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <Label>Senha atual</Label>
+      {/* Conta (read-only) */}
+      {user && (
+        <>
+          <div className="px-4 py-5">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Conta</p>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Usuário</span>
+                <span className="text-sm font-medium text-foreground">@{user.username}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Permissão</span>
+                <span className="text-sm font-medium text-primary">Super Admin</span>
+              </div>
+            </div>
+          </div>
+          <Separator />
+        </>
+      )}
+
+      {/* Segurança */}
+      <form onSubmit={passwordForm.handleSubmit(onChangePassword)}>
+        <div className="px-4 py-5">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Segurança</p>
+          <div className="flex flex-col gap-4">
+            <Field label="Senha atual" error={passwordForm.formState.errors.currentPassword?.message}>
               <PasswordInput autoComplete="current-password" {...passwordForm.register('currentPassword')} />
-              {passwordForm.formState.errors.currentPassword && (
-                <p className="text-xs text-destructive">{passwordForm.formState.errors.currentPassword.message}</p>
-              )}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label>Nova senha</Label>
+            </Field>
+            <Field label="Nova senha" error={passwordForm.formState.errors.newPassword?.message}>
               <PasswordInput autoComplete="new-password" {...passwordForm.register('newPassword')} />
-              {passwordForm.formState.errors.newPassword && (
-                <p className="text-xs text-destructive">{passwordForm.formState.errors.newPassword.message}</p>
-              )}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label>Confirmar nova senha</Label>
+            </Field>
+            <Field label="Confirmar nova senha" error={passwordForm.formState.errors.confirmPassword?.message}>
               <PasswordInput autoComplete="new-password" {...passwordForm.register('confirmPassword')} />
-              {passwordForm.formState.errors.confirmPassword && (
-                <p className="text-xs text-destructive">{passwordForm.formState.errors.confirmPassword.message}</p>
-              )}
-            </div>
-            <Button type="submit" disabled={changingPw} className="self-end">
-              {changingPw ? <><Loader2 size={14} className="animate-spin" /> Alterando...</> : 'Alterar senha'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            </Field>
+          </div>
+        </div>
+        <div className="px-4 pb-2">
+          <Button type="submit" variant="outline" className="w-full" disabled={changingPw}>
+            {changingPw ? <><Loader2 size={14} className="animate-spin" /> Alterando...</> : 'Alterar senha'}
+          </Button>
+        </div>
+      </form>
+
+      <Separator className="mt-4" />
+
+      <div className="px-4 py-5">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Sessão</p>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+          onClick={logout}
+        >
+          <LogOut size={16} strokeWidth={1.5} />
+          Sair da conta
+        </Button>
+      </div>
     </div>
   )
 }

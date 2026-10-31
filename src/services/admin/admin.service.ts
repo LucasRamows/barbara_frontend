@@ -19,7 +19,7 @@ export interface PersonalRow {
 }
 
 export interface CreatePersonalData {
-  username: string
+  username?: string
   password: string
   name: string
   email?: string

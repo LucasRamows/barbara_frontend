@@ -58,6 +58,7 @@ export interface SessionSummary {
   status: SessionStatus
   isDeload: boolean
   planSnapshot: { planName: string }
+  planName?: string | null
 }
 
 export interface LoadSuggestion {

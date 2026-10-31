@@ -13,6 +13,18 @@ export interface BodyMeasurement {
   thigh: number | null
   arm: number | null
   neck: number | null
+  shoulders: number | null
+  abdomen: number | null
+  rightArm: number | null
+  leftArm: number | null
+  rightForearm: number | null
+  leftForearm: number | null
+  rightThigh: number | null
+  leftThigh: number | null
+  rightCalf: number | null
+  leftCalf: number | null
+  face: number | null
+  hairLength: number | null
   notes: string | null
   createdAt: string
   updatedAt: string

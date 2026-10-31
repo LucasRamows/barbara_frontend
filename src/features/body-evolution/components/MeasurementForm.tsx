@@ -1,6 +1,8 @@
 import { X } from "lucide-react";
 import React from "react";
 import type { MeasurementRecord } from "../../../types/body-evolution";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface MeasurementFormProps {
   isOpen: boolean;
@@ -51,99 +53,78 @@ export const MeasurementForm: React.FC<MeasurementFormProps> = ({
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Mês (AAAA-MM)
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Mês (AAAA-MM)</Label>
+                <Input
                   required
                   type="month"
                   name="month"
                   defaultValue={initialData?.month}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Peso (kg)
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Peso (kg)</Label>
+                <Input
                   required
                   name="weight"
                   type="number"
                   step="0.1"
                   defaultValue={initialData?.weight}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Peito (cm)
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Peito (cm)</Label>
+                <Input
                   required
                   name="chest"
                   type="number"
                   step="0.1"
                   defaultValue={initialData?.chest}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Ombros (cm)
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Ombros (cm)</Label>
+                <Input
                   name="shoulders"
                   type="number"
                   step="0.1"
                   defaultValue={initialData?.shoulders}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Cintura
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Cintura</Label>
+                <Input
                   required
                   name="waist"
                   type="number"
                   step="0.1"
                   defaultValue={initialData?.waist}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Braço
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Braço</Label>
+                <Input
                   required
                   name="arms"
                   type="number"
                   step="0.1"
                   defaultValue={initialData?.arms}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Perna
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Perna</Label>
+                <Input
                   required
                   name="legs"
                   type="number"
                   step="0.1"
                   defaultValue={initialData?.legs}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
             </div>

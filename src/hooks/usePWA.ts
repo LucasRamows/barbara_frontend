@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useSession } from '@/contexts/SessionContext'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -6,10 +7,28 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function usePWA() {
+  const { user } = useSession()
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(false)
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null)
+  const [browserId] = useState(() => {
+    const key = 'barbara:pwa-browser-id:v1'
+    const existing = localStorage.getItem(key)
+    if (existing) return existing
+    const generated = crypto.randomUUID()
+    localStorage.setItem(key, generated)
+    return generated
+  })
+  const preferenceKey = useMemo(
+    () => (user ? `barbara:pwa-install-prompt:v1:${user.id}:${browserId}` : null),
+    [browserId, user],
+  )
+  const [installPromptSeen, setInstallPromptSeen] = useState(false)
+
+  useEffect(() => {
+    setInstallPromptSeen(Boolean(preferenceKey && localStorage.getItem(preferenceKey) === 'seen'))
+  }, [preferenceKey])
 
   useEffect(() => {
     const mq = window.matchMedia('(display-mode: standalone)')
@@ -52,13 +71,20 @@ export function usePWA() {
     if (outcome === 'accepted') setInstallPrompt(null)
   }, [installPrompt])
 
+  const markInstallPromptSeen = useCallback(() => {
+    if (!preferenceKey) return
+    localStorage.setItem(preferenceKey, 'seen')
+  }, [preferenceKey])
+
   const applyUpdate = useCallback(() => {
     registration?.waiting?.postMessage({ type: 'SKIP_WAITING' })
     window.location.reload()
   }, [registration])
 
   return {
-    canInstall: !!installPrompt && !isInstalled,
+    canInstall: !!installPrompt && !isInstalled && !!user && !installPromptSeen,
+    installPromptSeen,
+    markInstallPromptSeen,
     isInstalled,
     updateAvailable,
     promptInstall,

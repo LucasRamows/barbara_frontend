@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { X } from "lucide-react";
 import type { Exercise, ExerciseOnDay } from "../../../types/workout";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface WorkoutModalProps {
   isOpen: boolean;
@@ -38,6 +41,12 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
     onClose();
   };
 
+  const selectClass = cn(
+    "w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground shadow-xs",
+    "transition-[color,box-shadow] outline-none dark:bg-input/30",
+    "focus:border-ring focus:ring-ring/50 focus:ring-[3px]",
+  );
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-background/80 backdrop-blur-sm">
       <div className="bg-card w-full max-w-lg rounded-t-3xl sm:rounded-3xl border border-border shadow-2xl animate-in slide-in-from-bottom duration-300">
@@ -55,15 +64,13 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                Nome do Exercício
-              </label>
+            <div className="space-y-1.5">
+              <Label>Nome do Exercício</Label>
               <select
                 required
                 name="exerciseId"
                 defaultValue={editingExercise?.exercise?.id || ""}
-                className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
+                className={selectClass}
               >
                 <option value="" disabled>
                   Selecione um exercício
@@ -77,55 +84,43 @@ export const WorkoutModal: React.FC<WorkoutModalProps> = ({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Séries
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Séries</Label>
+                <Input
                   required
                   name="sets"
                   type="number"
                   defaultValue={editingExercise?.sets || 4}
                   placeholder="4"
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Repetições
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Repetições</Label>
+                <Input
                   required
                   name="reps"
                   defaultValue={editingExercise?.reps || "10-12"}
                   placeholder="10-12"
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Carga (kg)
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Carga (kg)</Label>
+                <Input
                   name="weight"
                   type="number"
                   step="0.5"
                   defaultValue={editingExercise?.weight || 0}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Descanso (seg)
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Descanso (seg)</Label>
+                <Input
                   name="restTime"
                   type="number"
                   defaultValue={editingExercise?.restTime || 60}
-                  className="w-full bg-secondary/50 border border-border rounded-xl p-3 focus:outline-none focus:border-primary transition-all font-medium text-sm"
                 />
               </div>
             </div>

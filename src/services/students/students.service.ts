@@ -2,7 +2,7 @@ import { api } from '@/lib/api'
 import type { StudentProfile } from '@/types/student.types'
 
 export interface CreateStudentDto {
-  username: string
+  username?: string
   password: string
   name: string
   email?: string

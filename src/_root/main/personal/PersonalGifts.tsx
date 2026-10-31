@@ -540,7 +540,9 @@ function ProgressTab() {
             <div className="flex flex-col gap-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Progresso</h3>
               {progress.map(p => {
-                const pct = Math.min(100, Math.round((p.currentValue / p.rule.targetValue) * 100))
+                const pct = p.rule.targetValue && p.rule.targetValue > 0
+                  ? Math.min(100, Math.round((p.currentValue / p.rule.targetValue) * 100))
+                  : null
                 return (
                   <div key={p.id} className="rounded-xl border bg-card p-4">
                     <div className="mb-2 flex items-center justify-between">
@@ -551,14 +553,14 @@ function ProgressTab() {
                         </Badge>
                       ) : (
                         <span className="text-xs text-muted-foreground">
-                          {p.currentValue} / {p.rule.targetValue}
+                          {pct == null ? 'Meta sem alvo numérico' : `${p.currentValue} / ${p.rule.targetValue}`}
                         </span>
                       )}
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-muted">
                       <div
                         className="h-full rounded-full bg-primary transition-all"
-                        style={{ width: `${pct}%` }}
+                        style={{ width: `${pct ?? 0}%` }}
                       />
                     </div>
                   </div>

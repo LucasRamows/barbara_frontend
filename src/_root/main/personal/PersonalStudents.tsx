@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
@@ -11,6 +12,8 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { EmptyState } from '@/components/ui/empty'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/common/DatePicker'
+import formatPhone from '@/lib/formatPhone'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Sheet,
@@ -39,8 +42,7 @@ import { Textarea } from '@/components/ui/textarea'
 const createSchema = z.object({
   username: z
     .string()
-    .min(3, 'Mínimo 3 caracteres')
-    .regex(/^[a-zA-Z0-9_]+$/, 'Somente letras, números e _'),
+    .optional(),
   password: z.string().min(6, 'Mínimo 6 caracteres'),
   name: z.string().min(1, 'Nome é obrigatório'),
   email: z.string().email('E-mail inválido').optional().or(z.literal('')),
@@ -111,9 +113,8 @@ function CreateStudentSheet({
   onClose: () => void
   onCreated: () => void
 }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const form = useForm<CreateFormValues>({
-    resolver: zodResolver(createSchema) as any,
+    resolver: zodResolver(createSchema) as Resolver<CreateFormValues>,
     defaultValues: {
       username: '',
       password: '',
@@ -148,8 +149,8 @@ function CreateStudentSheet({
       form.reset()
       onCreated()
       onClose()
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Erro ao cadastrar aluno'
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erro ao cadastrar aluno'
       toast.error(msg)
     }
   }
@@ -168,10 +169,15 @@ function CreateStudentSheet({
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Usuário *</FormLabel>
+                  <FormLabel>Usuário (opcional)</FormLabel>
                   <FormControl>
                     <Input placeholder="nome_do_aluno" {...field} />
                   </FormControl>
+                  {!field.value && form.watch('name') && (
+                    <p className="text-xs text-muted-foreground">
+                      Será gerado a partir do nome: <strong>{form.watch('name').toLowerCase().trim().replace(/\s+/g, '_')}</strong>
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -222,13 +228,17 @@ function CreateStudentSheet({
                 <FormItem>
                   <FormLabel>Telefone</FormLabel>
                   <FormControl>
-                    <Input placeholder="(00) 00000-0000" {...field} />
+                    <Input
+                      placeholder="(00) 00000-0000"
+                      value={field.value ?? ''}
+                      onChange={(event) => field.onChange(formatPhone(event.target.value))}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               <FormField
                 control={form.control}
                 name="birthDate"
@@ -236,7 +246,7 @@ function CreateStudentSheet({
                   <FormItem>
                     <FormLabel>Data de nascimento</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <DatePicker value={field.value} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -266,7 +276,7 @@ function CreateStudentSheet({
                 )}
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
               <FormField
                 control={form.control}
                 name="height"

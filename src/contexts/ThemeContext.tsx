@@ -8,81 +8,52 @@ import {
 
 const THEME_KEY = 'barbara-theme'
 
-export type Theme = 'light' | 'dark' | 'system'
-
 interface ThemeContextValue {
-  theme: Theme
-  resolvedTheme: 'light' | 'dark'
-  setTheme: (theme: Theme) => void
+  isDark: boolean
+  theme: 'light' | 'dark'
+  setTheme: (theme: 'light' | 'dark') => void
+  toggleTheme: () => void
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
-function getSystemTheme(): 'light' | 'dark' {
-  try {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  } catch {
-    return 'light'
-  }
-}
-
-function readStoredTheme(): Theme {
+function readInitialTheme(): boolean {
   try {
     const stored = window.localStorage.getItem(THEME_KEY)
-    if (stored === 'light' || stored === 'dark' || stored === 'system') return stored
+    if (stored) return stored === 'dark'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
   } catch {
-    // ignore
-  }
-  return 'system'
-}
-
-function applyTheme(resolved: 'light' | 'dark') {
-  try {
-    if (resolved === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  } catch {
-    // ignore
+    return false
   }
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(readStoredTheme)
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(getSystemTheme)
-
-  const resolvedTheme: 'light' | 'dark' = theme === 'system' ? systemTheme : theme
+  const [isDark, setIsDark] = useState<boolean>(readInitialTheme)
 
   useEffect(() => {
-    applyTheme(resolvedTheme)
-  }, [resolvedTheme])
-
-  useEffect(() => {
-    let mql: MediaQueryList | null = null
     try {
-      mql = window.matchMedia('(prefers-color-scheme: dark)')
-      const handler = (e: MediaQueryListEvent) => {
-        setSystemTheme(e.matches ? 'dark' : 'light')
+      if (isDark) {
+        document.documentElement.classList.add('dark')
+        window.localStorage.setItem(THEME_KEY, 'dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+        window.localStorage.setItem(THEME_KEY, 'light')
       }
-      mql.addEventListener('change', handler)
-      return () => mql!.removeEventListener('change', handler)
     } catch {
-      // ignore
+      // storage indisponível
     }
+  }, [isDark])
+
+  const setTheme = useCallback((theme: 'light' | 'dark') => {
+    setIsDark(theme === 'dark')
   }, [])
 
-  const setTheme = useCallback((next: Theme) => {
-    setThemeState(next)
-    try {
-      window.localStorage.setItem(THEME_KEY, next)
-    } catch {
-      // ignore
-    }
+  const toggleTheme = useCallback(() => {
+    setIsDark((prev) => !prev)
   }, [])
 
   return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>
+    <ThemeContext.Provider value={{ isDark, theme: isDark ? 'dark' : 'light', setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   )

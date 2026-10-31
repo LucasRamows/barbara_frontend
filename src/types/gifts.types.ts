@@ -27,7 +27,7 @@ export interface RewardRule {
   name: string
   description: string | null
   type: RewardRuleType
-  targetValue: number
+  targetValue: number | null
   muscleGroup: string | null
   isActive: boolean
   createdAt: string
@@ -49,7 +49,16 @@ export interface RewardAchievement {
   studentId: string
   ruleId: string
   rule: RewardRule
-  status: 'PENDING' | 'ACKNOWLEDGED'
+  status:
+    | 'IN_PROGRESS'
+    | 'ACHIEVED'
+    | 'AWAITING_APPROVAL'
+    | 'APPROVED'
+    | 'REJECTED'
+    | 'DELIVERED'
+    | 'CANCELLED'
+    | 'PENDING'
+    | 'ACKNOWLEDGED'
   achievedAt: string | null
   acknowledgedAt: string | null
   createdAt: string

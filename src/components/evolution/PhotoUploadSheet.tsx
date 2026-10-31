@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { progressPhotosService } from '@/services/progress-photos/progress-photos.service'
@@ -6,7 +7,7 @@ import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { ImageIcon } from 'lucide-react'
@@ -109,7 +110,7 @@ export function PhotoUploadSheet({ studentId, open, onClose, onCreated }: Props)
           {/* Date */}
           <div>
             <Label className="mb-1.5 block">Data</Label>
-            <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
+            <DatePicker value={date} onChange={setDate} />
           </div>
 
           {/* Position */}

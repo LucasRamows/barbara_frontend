@@ -2,12 +2,13 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '@/services/auth/auth.service'
 import type { AuthUser, Role } from '@/types/auth.types'
+import { clearSessionQueries } from '@/lib/query-client'
 
 interface SessionContextType {
   user: AuthUser | null
   sessionReady: boolean
   isAuthenticated: boolean
-  login: (username: string, password: string) => Promise<void>
+  login: (identifier: string, password: string) => Promise<void>
   logout: () => Promise<void>
 }
 
@@ -29,6 +30,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     setSessionReady(true)
 
     const handleLogout = () => {
+      void clearSessionQueries()
       setUser(null)
       navigate('/sign-in', { replace: true })
     }
@@ -36,8 +38,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('auth:logout', handleLogout)
   }, [navigate])
 
-  const login = async (username: string, password: string) => {
-    const result = await authService.login(username, password)
+  const login = async (identifier: string, password: string) => {
+    const result = await authService.login(identifier, password)
     setUser(result.user)
     navigate(homeForRole(result.user.role), { replace: true })
   }

@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Download, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { usePWA } from '@/hooks/usePWA'
 
 export function PWAInstallPrompt() {
-  const { canInstall, promptInstall } = usePWA()
+  const { canInstall, promptInstall, markInstallPromptSeen } = usePWA()
   const [dismissed, setDismissed] = useState(false)
+
+  useEffect(() => {
+    if (canInstall) markInstallPromptSeen()
+  }, [canInstall, markInstallPromptSeen])
 
   if (!canInstall || dismissed) return null
 

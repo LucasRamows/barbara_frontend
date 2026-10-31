@@ -17,6 +17,7 @@ import {
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { PasswordInput } from '@/components/shared/PasswordInput'
 import { adminService, type PersonalRow, type CreatePersonalData, type UpdatePersonalData } from '@/services/admin/admin.service'
+import formatPhone from '@/lib/formatPhone'
 
 const STATUS_CONFIG = {
   ACTIVE: { label: 'Ativo', className: 'bg-success/15 text-success' },
@@ -40,7 +41,6 @@ function CreatePersonalSheet({
 
   function validate() {
     const e: typeof errors = {}
-    if (!form.username.trim()) e.username = 'Obrigatório'
     if (form.password.length < 6) e.password = 'Mínimo 6 caracteres'
     if (!form.name.trim()) e.name = 'Obrigatório'
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'E-mail inválido'
@@ -54,7 +54,7 @@ function CreatePersonalSheet({
     setSubmitting(true)
     try {
       const created = await adminService.createPersonal({
-        username: form.username.trim(),
+        username: form.username?.trim() || undefined,
         password: form.password,
         name: form.name.trim(),
         email: form.email || undefined,
@@ -80,7 +80,7 @@ function CreatePersonalSheet({
         </SheetHeader>
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="c-username">Usuário <span className="text-destructive">*</span></Label>
+            <Label htmlFor="c-username">Usuário <span className="text-muted-foreground text-xs">(opcional)</span></Label>
             <Input
               id="c-username"
               autoCapitalize="none"
@@ -88,6 +88,11 @@ function CreatePersonalSheet({
               onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
             />
             {errors.username && <p className="text-xs text-destructive">{errors.username}</p>}
+            {!form.username?.trim() && form.name.trim() && (
+              <p className="text-xs text-muted-foreground">
+                Será gerado a partir do nome: <strong>{form.name.toLowerCase().trim().replace(/\s+/g, '_')}</strong>
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -130,7 +135,7 @@ function CreatePersonalSheet({
               type="tel"
               inputMode="tel"
               value={form.phone}
-              onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+              onChange={e => setForm(f => ({ ...f, phone: formatPhone(e.target.value) }))}
             />
           </div>
 
@@ -208,7 +213,7 @@ function EditPersonalSheet({
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="e-phone">Telefone</Label>
-            <Input id="e-phone" type="tel" inputMode="tel" value={form.phone ?? ''} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+            <Input id="e-phone" type="tel" inputMode="tel" value={form.phone ?? ''} onChange={e => setForm(f => ({ ...f, phone: formatPhone(e.target.value) }))} />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="e-bio">Bio <span className="text-muted-foreground text-xs">(opcional)</span></Label>

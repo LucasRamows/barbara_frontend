@@ -42,15 +42,15 @@ function PhotoCard({ photo, onDelete }: PhotoCardProps) {
           onError={() => setErrored(true)}
         />
       )}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-        <p className="text-[10px] text-white">{POSITION_LABELS[photo.position]}</p>
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/70 to-transparent p-2">
+        <p className="text-[10px] text-background">{POSITION_LABELS[photo.position]}</p>
       </div>
       {onDelete && (
         <ConfirmDialog
           trigger={
             <button
               type="button"
-              className="absolute right-1 top-1 hidden rounded-full bg-black/50 p-1 text-white transition-all hover:bg-black/70 group-hover:flex items-center justify-center"
+              className="absolute right-1 top-1 hidden items-center justify-center rounded-full bg-foreground/70 p-1 text-background transition-all hover:bg-foreground group-hover:flex"
             >
               <X size={12} />
             </button>
@@ -82,12 +82,12 @@ function Lightbox({ photos, startIndex, onClose }: LightboxProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/95"
       onClick={onClose}
     >
       <div className="relative flex h-full w-full items-center justify-center" onClick={e => e.stopPropagation()}>
         {errored ? (
-          <div className="flex flex-col items-center gap-2 text-white/60">
+          <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <ImageIcon size={48} />
             <p className="text-sm">Imagem indisponível</p>
           </div>
@@ -99,24 +99,24 @@ function Lightbox({ photos, startIndex, onClose }: LightboxProps) {
             onError={() => setErrored(true)}
           />
         )}
-        <button type="button" onClick={onClose} className="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white">
+        <button type="button" onClick={onClose} className="absolute right-4 top-4 rounded-full bg-foreground/70 p-2 text-background">
           <X size={20} />
         </button>
         {idx > 0 && (
-          <button type="button" onClick={prev} className="absolute left-2 rounded-full bg-black/50 p-2 text-white">
+          <button type="button" onClick={prev} className="absolute left-2 rounded-full bg-foreground/70 p-2 text-background">
             <ChevronLeft size={24} />
           </button>
         )}
         {idx < photos.length - 1 && (
-          <button type="button" onClick={next} className="absolute right-2 rounded-full bg-black/50 p-2 text-white">
+          <button type="button" onClick={next} className="absolute right-2 rounded-full bg-foreground/70 p-2 text-background">
             <ChevronRight size={24} />
           </button>
         )}
         <div className="absolute bottom-4 left-0 right-0 text-center">
-          <p className="text-sm text-white/80">
+          <p className="text-sm text-foreground">
             {format(new Date(photo.date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })} · {POSITION_LABELS[photo.position]}
           </p>
-          <p className="mt-1 text-xs text-white/50">{idx + 1} / {photos.length}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{idx + 1} / {photos.length}</p>
         </div>
       </div>
     </div>

@@ -17,6 +17,10 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import apiBack from "@/lib/api";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/common/DatePicker";
 
 interface HealthExam {
   id: string;
@@ -67,7 +71,6 @@ const HealthModule: React.FC = () => {
   const [examFile, setExamFile] = useState<File | null>(null);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
 
-  // New states for tabs and mock data
   const [activeTab, setActiveTab] = useState<"exams" | "procedures" | "tracking">("exams");
   const [procedures, setProcedures] = useState<Procedure[]>([]);
   const [weights, setWeights] = useState<WeightTrack[]>([]);
@@ -96,8 +99,7 @@ const HealthModule: React.FC = () => {
         console.error("Erro ao buscar notas:", error);
       }
     };
-    
-    // Simulação temporária
+
     setProcedures([{ id: "1", description: "Fisioterapia", date: "2023-11-20", notes: "Sessão 1/10 feita." }]);
     setWeights([{ id: "1", weight: 75.5, date: "2023-10-15" }, { id: "2", weight: 74.2, date: "2023-11-20" }]);
 
@@ -125,7 +127,7 @@ const HealthModule: React.FC = () => {
       formData.append("file", examFile);
       try {
         const uploadRes = await apiBack.post("/private/health/upload", formData, {
-          headers: { 
+          headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data"
           }
@@ -155,6 +157,7 @@ const HealthModule: React.FC = () => {
     setExamFile(null);
     setNewExam({ title: "", date: "", category: "", note: "", fileUrl: "" });
   };
+
   const handleDeleteExam = async (id: string) => {
     try {
       await apiBack.delete(`/private/health/${id}`, {
@@ -165,6 +168,7 @@ const HealthModule: React.FC = () => {
     }
     setExams(exams.filter((x) => x.id !== id));
   };
+
   const handleCreateReminder = async () => {
     setLoading(true);
     if (!newTask.name || !newTask.date) return;
@@ -190,6 +194,7 @@ const HealthModule: React.FC = () => {
       setLoading(false);
     }
   };
+
   const handleDeleteTask = async (id: string) => {
     try {
       await apiBack.delete(`/private/tasks/${id}`, {
@@ -201,6 +206,7 @@ const HealthModule: React.FC = () => {
       setTask(task.filter((x) => x.id !== id));
     }
   };
+
   const onEdit = async (exam: HealthExam) => {
     setisEditModalOpen(true);
     setEditExams(exam);
@@ -268,7 +274,6 @@ const HealthModule: React.FC = () => {
                       <span className="text-[10px] bg-secondary px-3 py-1 rounded-full font-bold text-secondary-foreground italic border border-border">
                         {exam.category}
                       </span>
-                      {/* Espaço para botões de ação se necessário */}
                       <div className="flex gap-2">
                         {exam.fileUrl && (
                           <a href={exam.fileUrl} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-indigo-500 transition-colors">
@@ -316,34 +321,23 @@ const HealthModule: React.FC = () => {
 
           <div className="bg-card border border-border rounded-2xl p-6">
             <div className="space-y-4">
-              {/* Input de Texto */}
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground px-1">
-                  O que você precisa fazer?
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>O que você precisa fazer?</Label>
+                <Input
                   type="text"
                   value={newTask.name}
-                  onChange={(e) =>
-                    setNewTask({ ...newTask, name: e.target.value })
-                  }
+                  onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
                   placeholder="Ex: Tomar Creatina, Beber 3L água..."
-                  className="w-full bg-secondary/50 border border-input p-3 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground px-1">
-                    Data/Hora
-                  </label>
-                  <input
+                <div className="space-y-1.5">
+                  <Label>Data/Hora</Label>
+                  <Input
                     type="datetime-local"
                     value={newTask.date}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, date: e.target.value })
-                    }
-                    className="w-full bg-secondary/50 border border-input p-2 rounded-lg text-xs outline-none"
+                    onChange={(e) => setNewTask({ ...newTask, date: e.target.value })}
                   />
                 </div>
                 <div className="flex items-end">
@@ -358,7 +352,6 @@ const HealthModule: React.FC = () => {
               </div>
             </div>
 
-            {/* Lista de Lembretes (Opcional - para visualização) */}
             {task.length > 0 && (
               <div className="mt-6 space-y-2 border-t border-border pt-4">
                 {task.map((item) => (
@@ -421,7 +414,6 @@ const HealthModule: React.FC = () => {
 
       {activeTab === "tracking" && (
       <div className="space-y-6 animate-in fade-in duration-300">
-         {/* Evolução de Peso */}
          <div className="bg-card p-6 rounded-3xl border border-border shadow-sm flex flex-col md:flex-row gap-6 items-center">
             <div className="p-4 bg-primary/10 rounded-full text-primary">
                <Scale size={48} />
@@ -429,7 +421,7 @@ const HealthModule: React.FC = () => {
             <div className="flex-1">
                <h3 className="font-bold text-xl">Controle de Peso</h3>
                <p className="text-xs text-muted-foreground mt-1">Insira seu peso regularmente para comparar sua evolução.</p>
-               
+
                <div className="flex items-center gap-4 mt-4">
                   {weights.slice(-2).map((w, i) => (
                     <div key={w.id} className={`p-4 rounded-2xl border ${i === 1 ? 'bg-primary border-primary text-primary-foreground' : 'bg-background border-border text-foreground'}`}>
@@ -444,7 +436,6 @@ const HealthModule: React.FC = () => {
             </div>
          </div>
 
-         {/* Fotos de Acompanhamento */}
          <div className="bg-card p-6 rounded-3xl border border-border shadow-sm">
             <div className="flex justify-between items-center mb-6">
                <h3 className="font-bold text-xl flex items-center gap-2"><Camera className="text-primary"/> Fotos Diárias/Mensais</h3>
@@ -453,7 +444,6 @@ const HealthModule: React.FC = () => {
                </button>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-               {/* Placeholders visuais para mostrar ideia */}
                <div className="aspect-[3/4] bg-muted rounded-2xl border border-border flex items-center justify-center text-muted-foreground flex-col gap-2">
                   <Camera size={24} className="opacity-50" />
                   <span className="text-[10px] uppercase font-black tracking-widest">Novembro</span>
@@ -467,7 +457,6 @@ const HealthModule: React.FC = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-card border border-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Modal Header */}
             <div className="p-6 border-b border-border flex justify-between items-center bg-secondary/20">
               <h2 className="font-neusharp text-xl italic uppercase tracking-tighter">
                 Novo Exame
@@ -480,78 +469,53 @@ const HealthModule: React.FC = () => {
               </button>
             </div>
 
-            {/* Modal Body / Form */}
             <form onSubmit={handleSaveExam} className="p-6 space-y-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Nome do Exame
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Nome do Exame</Label>
+                <Input
                   required
                   type="text"
                   placeholder="Ex: Ressonância Magnética"
-                  className="w-full bg-background border border-input p-3 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all"
                   value={newExam.title}
-                  onChange={(e) =>
-                    setNewExam({ ...newExam, title: e.target.value })
-                  }
+                  onChange={(e) => setNewExam({ ...newExam, title: e.target.value })}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                    Data
-                  </label>
-                  <input
-                    required
-                    type="date"
-                    className="w-full bg-background border border-input p-3 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm"
+                <div className="space-y-1.5">
+                  <Label>Data</Label>
+                  <DatePicker
                     value={newExam.date}
-                    onChange={(e) =>
-                      setNewExam({ ...newExam, date: e.target.value })
-                    }
+                    onChange={(v) => setNewExam({ ...newExam, date: v })}
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                    Categoria
-                  </label>
-                  <input
+                <div className="space-y-1.5">
+                  <Label>Categoria</Label>
+                  <Input
                     type="text"
                     placeholder="Ex: Imagem"
-                    className="w-full bg-background border border-input p-3 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm"
                     value={newExam.category}
-                    onChange={(e) =>
-                      setNewExam({ ...newExam, category: e.target.value })
-                    }
+                    onChange={(e) => setNewExam({ ...newExam, category: e.target.value })}
                   />
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Observações Importantes
-                </label>
-                <textarea
+              <div className="space-y-1.5">
+                <Label>Observações Importantes</Label>
+                <Textarea
                   rows={3}
                   placeholder="Resultados, recomendações médicas, etc..."
-                  className="w-full bg-background border border-input p-3 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm resize-none"
                   value={newExam.note}
-                  onChange={(e) =>
-                    setNewExam({ ...newExam, note: e.target.value })
-                  }
+                  onChange={(e) => setNewExam({ ...newExam, note: e.target.value })}
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Anexar Laudo (PDF/Imagem)
-                </label>
+              <div className="space-y-1.5">
+                <Label>Anexar Laudo (PDF/Imagem)</Label>
                 <input
                   type="file"
                   onChange={(e) => setExamFile(e.target.files?.[0] || null)}
-                  className="w-full bg-background border border-input p-3 rounded-xl file:mr-4 file:px-4 file:py-2 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 text-sm"
+                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground shadow-xs dark:bg-input/30 file:mr-4 file:px-3 file:py-1 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
                 />
               </div>
 
@@ -560,7 +524,7 @@ const HealthModule: React.FC = () => {
                 disabled={isUploadingFile}
                 className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-neusharp italic flex items-center justify-center gap-2 mt-4 hover:opacity-90 transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
               >
-                {isUploadingFile ? <Loader2 className="animate-spin" size={18}/> : <Save size={18} />} 
+                {isUploadingFile ? <Loader2 className="animate-spin" size={18}/> : <Save size={18} />}
                 {isUploadingFile ? "SALVANDO..." : "SALVAR REGISTRO"}
               </button>
             </form>
@@ -572,7 +536,6 @@ const HealthModule: React.FC = () => {
       {isEditModalOpen && editExams && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-card border border-border w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Modal Header */}
             <div className="p-6 border-b border-border flex justify-between items-center bg-secondary/20">
               <h2 className="font-neusharp text-xl italic uppercase tracking-tighter">
                 Editar Exame
@@ -585,70 +548,47 @@ const HealthModule: React.FC = () => {
               </button>
             </div>
 
-            {/* Modal Body / Form */}
             <form
               onSubmit={() => handleEditExam(editExams.id)}
               className="p-6 space-y-4"
             >
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Nome do Exame
-                </label>
-                <input
+              <div className="space-y-1.5">
+                <Label>Nome do Exame</Label>
+                <Input
                   required
                   type="text"
                   placeholder="Ex: Ressonância Magnética"
-                  className="w-full bg-background border border-input p-3 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all"
                   value={editExams.title}
-                  onChange={(e) =>
-                    setEditExams({ ...editExams, title: e.target.value })
-                  }
+                  onChange={(e) => setEditExams({ ...editExams, title: e.target.value })}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                    Data
-                  </label>
-                  <input
-                    required
-                    type="date"
-                    className="w-full bg-background border border-input p-3 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm"
+                <div className="space-y-1.5">
+                  <Label>Data</Label>
+                  <DatePicker
                     value={editExams.date}
-                    onChange={(e) =>
-                      setEditExams({ ...editExams, date: e.target.value })
-                    }
+                    onChange={(v) => setEditExams({ ...editExams, date: v })}
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                    Categoria
-                  </label>
-                  <input
+                <div className="space-y-1.5">
+                  <Label>Categoria</Label>
+                  <Input
                     type="text"
                     placeholder="Ex: Imagem"
-                    className="w-full bg-background border border-input p-3 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm"
                     value={editExams.category}
-                    onChange={(e) =>
-                      setEditExams({ ...editExams, category: e.target.value })
-                    }
+                    onChange={(e) => setEditExams({ ...editExams, category: e.target.value })}
                   />
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
-                  Observações Importantes
-                </label>
-                <textarea
+              <div className="space-y-1.5">
+                <Label>Observações Importantes</Label>
+                <Textarea
                   rows={3}
                   placeholder="Resultados, recomendações médicas, etc..."
-                  className="w-full bg-background border border-input p-3 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm resize-none"
                   value={editExams.note}
-                  onChange={(e) =>
-                    setEditExams({ ...editExams, note: e.target.value })
-                  }
+                  onChange={(e) => setEditExams({ ...editExams, note: e.target.value })}
                 />
               </div>
 

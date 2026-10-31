@@ -1,5 +1,6 @@
 import { useSidebar } from '@/components/ui/sidebar'
 import { SidebarHeader } from '@/components/ui/sidebar'
+import { BarbaraLogo } from '@/components/brand/BarbaraLogo'
 
 export function SidebarBrandHeader() {
   const { state } = useSidebar()
@@ -8,11 +9,11 @@ export function SidebarBrandHeader() {
   return (
     <SidebarHeader className="border-b border-sidebar-border p-4">
       {isCollapsed ? (
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
-          <span className="font-display text-sm font-bold text-primary-foreground">B</span>
+        <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <BarbaraLogo className="size-5" title="Bárbara" />
         </div>
       ) : (
-        <span className="font-display text-xl font-bold text-primary">Bárbara</span>
+        <BarbaraLogo variant="wordmark" title="Bárbara" className="text-primary" />
       )}
     </SidebarHeader>
   )

@@ -5,14 +5,15 @@ import { z } from 'zod'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useSession } from '@/contexts/SessionContext'
+import { BarbaraLogo } from '@/components/brand/BarbaraLogo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { PasswordInput } from '@/components/shared/PasswordInput'
 
 const schema = z.object({
-  username: z.string().min(1, 'Informe seu usuário'),
+  identifier: z.string().min(1, 'Informe seu usuário ou e-mail'),
   password: z.string().min(1, 'Informe sua senha'),
 })
 
@@ -31,7 +32,7 @@ export default function SigninForm() {
   const onSubmit = async (values: FormValues) => {
     setLoading(true)
     try {
-      await login(values.username, values.password)
+      await login(values.identifier, values.password)
     } catch {
       toast.error('Usuário ou senha incorretos.')
     } finally {
@@ -42,30 +43,28 @@ export default function SigninForm() {
   return (
     <Card className="w-full">
       <CardHeader className="text-center">
-        <div className="mb-2 flex justify-center">
-          <span className="font-display text-4xl font-black text-primary tracking-tight">
-            Bárbara
-          </span>
+        <div className="mb-4 flex justify-center">
+          <div className="flex size-20 items-center justify-center rounded-3xl bg-primary text-primary-foreground shadow-lg shadow-primary/30">
+            <BarbaraLogo className="size-12" title="Bárbara" />
+          </div>
         </div>
-        <CardTitle className="text-xl">Bem-vinda</CardTitle>
-        <CardDescription>Entre para acessar sua plataforma.</CardDescription>
       </CardHeader>
 
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="username">Usuário</Label>
+            <Label htmlFor="identifier">Usuário ou e-mail</Label>
             <Input
-              id="username"
+              id="identifier"
               type="text"
               autoComplete="username"
               autoCapitalize="none"
               inputMode="text"
-              {...register('username')}
-              aria-invalid={Boolean(errors.username)}
+              {...register('identifier')}
+              aria-invalid={Boolean(errors.identifier)}
             />
-            {errors.username && (
-              <p className="text-xs text-destructive">{errors.username.message}</p>
+            {errors.identifier && (
+              <p className="text-xs text-destructive">{errors.identifier.message}</p>
             )}
           </div>
 

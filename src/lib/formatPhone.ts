@@ -1,6 +1,9 @@
-const formatPhone = (phone:string) => {
-  let digits = phone.replace(/\D/g, "");
-  digits = digits.slice(0, 11);
+export function normalizePhone(phone: string) {
+  return phone.replace(/\D/g, '').slice(0, 11)
+}
+
+const formatPhone = (phone: string) => {
+  const digits = normalizePhone(phone)
   let formatted = "";
   if (digits.length > 0) {
     if (digits.length <= 2) {
